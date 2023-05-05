@@ -1,0 +1,7 @@
+pikle
+numpy
+flask
+flask_restful
+matplotlib.pyplot
+seaborn
+pandas
