@@ -11,10 +11,10 @@ Do pip install -r requirements.txt
 
 TO RUN-
 <br/>
-node index.js
+>node index.js
 <br/>
-in new cmd, >
+in new cmd
 <br/>
-py main.py
+>py main.py
 <br/>
 then open localhost:3000, we should get result in our command
