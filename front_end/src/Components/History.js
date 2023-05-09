@@ -5,18 +5,21 @@ import HistoryFailer from './HistoryFailed';
 import { useEffect } from 'react';
 const History = (props) => {
   const [Prev,setPrev] = useState([]);
-  const getHistory = () => {
-    dataref.ref(`User/${sessionStorage.getItem('UserName')}/History`).get()
+  const [loading,setLoading]=useState(true);
+  let store=[];
+  async function getHistory(){
+    await dataref.ref(`User/${sessionStorage.getItem('UserName')}/History`).get()
       .then((e) => {
-        if (e.exists()) {
-          console.log(e.val());
-          sessionStorage.setItem("History",JSON.stringify(Object.values(e.val())));
-          console.log(JSON.parse(sessionStorage.getItem("History")));
-          
+        if (e.exists() && e.val()!=null) {
+          let arr=e.val();
+          for(const d in arr){
+            store.push(arr[d])
+          }   
         }
       }).catch((e)=>{
         console.log(e);
       })
+      setPrev(store);
   }
   useEffect(() => {
     getHistory();
@@ -33,6 +36,7 @@ const History = (props) => {
       {sessionStorage.getItem('UserName') == undefined ?
         <HistoryFailer />
         :
+        
         <div className="bg-white mt-10">
           <div className="mx-auto max-w-2xl lg:text-center">
             <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
@@ -87,10 +91,9 @@ const History = (props) => {
                 </thead>
                 <tbody className="table-tbody">
                   {
-                    JSON.parse(sessionStorage.getItem("History")).map((e) => {
-                      console.log(e);
-                        return <Records val={e}/>
-                      })
+                    Prev.map(e=>
+                      <Records val={e} />
+                      )
                   }
                 </tbody>
               </table>
@@ -101,69 +104,6 @@ const History = (props) => {
       }
     </div>
 
-    //   {/* <div className="flex flex-col">
-    //     <div className="-m-1.5 overflow-x-auto mx-10 my-10">
-    //       <div className="p-1.5 min-w-full inline-block align-middle">
-    //         <div className="overflow-hidden">
-    //           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-    //             <thead>
-    //               <tr>
-    //                 <th scope="col" className="px-6 py-3">Gender</th>
-    //                 <th scope="col" >Age</th>
-    //                 <th scope="col" >High BP</th>
-    //                 <th scope="col" >High Cholesterol</th>
-    //                 <th scope="col" >BMI</th>
-    //                 <th scope="col" >Injury's</th>
-    //                 <th scope="col" >Difficulty in Walk</th>
-    //                 <th scope="col" >Previous Heart Disease</th>
-    //                 <th scope='col'>General Health</th>
-    //                 <th scope="col" >Mental Health</th>
-    //                 <th scope="col" >Smoking</th>
-    //                 <th scope="col" >Alcoholic</th>
-    //                 <th scope='col'>Outcome</th>
-    //               </tr>
-    //             </thead>
-    //             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-    //               <Records/>
-    //             </tbody>
-    //           </table>
-    //         </div>
-    //       </div>
-    //     </div>
-    //   </div>
-    // </div> */}
-
-    // <div className='container my-3' style={style}>
-    //   {/* <span className="border">
-    //     No Previous Records...!
-    //   </span> */}
-    //   <h1 className="text-center display-7" style={style1}>Previous Records</h1>
-    //   <table className="table">
-    //     <thead>
-    //       <tr>
-    //         <th scope="col">#</th>
-    //         <th scope="col">gender</th>
-    //         <th scope="col">age</th>
-    //         <th scope="col">High BP</th>
-    //         <th scope="col">High Cholesterol</th>
-    //         <th scope="col">BMI</th>
-    //         <th scope="col">Previous Heart Disease</th>
-    //         <th scope="col">Physical Health</th>
-    //         <th scope="col">Mental Health</th>
-    //         <th scope="col">Smoking</th>
-    //         <th scope="col">Alcoholic</th>
-    //         <th scope="col">OutCome</th>
-    //       </tr>
-    //     </thead>
-    //     <tbody>
-    //       {
-
-    //       }
-    //       <Records/>
-    //     </tbody>
-    //   </table>
-
-    // </div>
   )
 }
 

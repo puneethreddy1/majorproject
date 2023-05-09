@@ -1,7 +1,7 @@
 import React from 'react'
 
-const Records = (props) => {
-
+export default function Records(props){
+console.log(props)
   return (
     <tr className="table-row">
       <td className="table-col" data-title="Name"><span className="text">
@@ -39,4 +39,3 @@ const Records = (props) => {
   )
 }
 
-export default Records
