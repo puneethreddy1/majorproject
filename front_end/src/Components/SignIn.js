@@ -1,11 +1,13 @@
 import React, { useState } from 'react'
 import { dataref } from './firebase'
+import NavBar from './Navbar'
 const SignIn = () => {
   const [userName, setuserName] = useState("")
   const [Email, setEmail] = useState("")
   const [Password1, setPassword1] = useState("")
   const [Password2, setPassword2] = useState("")
   const [isDoctor,setIsDoctor] = useState(false);
+  const [Desc,setDesc] = useState("");
 
   const checkPassword = () => {
     for (let index = 0; index < Password1.length; index++) {
@@ -18,7 +20,10 @@ const SignIn = () => {
   const createAsDoctor = async (e) =>{
     if (checkPassword()) {
       dataref.ref(`Doctor/${userName}/`).set({
-        email: Email
+        userName : userName,
+        email: Email,
+        desc:Desc,
+        Appointment:{}
       }).then(() => {
         console.log("Success");
       }).catch(e)
@@ -62,6 +67,8 @@ const SignIn = () => {
   }
 
   return (
+    <>
+    <NavBar/>
     <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
         <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
@@ -125,6 +132,7 @@ const SignIn = () => {
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
               />
             </div>
+            
             <div className="mt-2">
               <div className="flex items-center justify-between">
                 <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900">
@@ -145,6 +153,29 @@ const SignIn = () => {
                 />
               </div>
             </div>
+            { isDoctor ? <div className='mt-2'>
+            <div className="flex items-center justify-between">
+              <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900">
+                Description
+              </label>
+
+            </div>
+            <div className="mt-2">
+              <input
+                id="password"
+                name="password"
+                type="text"
+                autoComplete="current-password"
+                required
+                value={Desc}
+                onChange={(e) => { setDesc(e.target.value) }}
+                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              />
+            </div>
+            </div>
+            :
+            ""
+              }
           </div>
           <div class="form-check">
             <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1" onChange={(e)=>{setIsDoctor(e.target.checked)}}/>
@@ -165,6 +196,7 @@ const SignIn = () => {
 
       </div>
     </div>
+    </>
     // <div className='container my-3' style={style}>
     //     <form onSubmit={create}>
     //         <h1 className="text-center display-6">Sign In</h1>

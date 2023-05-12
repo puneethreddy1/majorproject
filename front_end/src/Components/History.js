@@ -3,6 +3,7 @@ import Records from './Records';
 import { dataref } from './firebase';
 import HistoryFailer from './HistoryFailed';
 import { useEffect } from 'react';
+import NavBar from './Navbar';
 const History = (props) => {
   const [Prev,setPrev] = useState([]);
   const [loading,setLoading]=useState(true);
@@ -33,6 +34,7 @@ const History = (props) => {
   }
   return (
     <div>
+      <NavBar/>
       {sessionStorage.getItem('UserName') == undefined ?
         <HistoryFailer />
         :
