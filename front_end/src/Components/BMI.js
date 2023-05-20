@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-
+import Navbar from './Navbar'
 const BMI = () => {
   const [height, setHeight] = useState("");
   const [weight, setWeight] = useState("");
@@ -28,6 +28,8 @@ const BMI = () => {
   }
   
   return (
+    <>
+    <Navbar />
     <form className="mx-auto max-w-7xl px-6 my-10" onSubmit={cal}>
       <div className="mx-auto max-w-2xl lg:text-center">
         <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
@@ -60,33 +62,9 @@ const BMI = () => {
     </div>
     </div>
     </div>
+    
 </form>
-    // <div className='container my-3' style={style}>
-    //   <h1 className='display-5' style={style1}>Calculate BMI</h1>
-    //   <form onSubmit={cal}>
-    //     <div className="mb-3">
-    //       <label htmlFor="exampleInputEmail1" className="form-label">Enter Your Height</label>
-    //       <input type="text" className="form-control" value={height} onChange={(e) => { setHeight(e.target.value) }} />
-    //       <div id="emailHelp" className="form-text">Enter height in Meters</div>
-    //     </div>
-    //     <div className="mb-3">
-    //       <label htmlFor="exampleInputPassword1" className="form-label">Enter Weight</label>
-    //       <input type="text" className="form-control" value={weight} onChange={(e) => { setWeight(e.target.value) }} />
-    //       <div id="emailHelp" className="form-text">Enter Weight in Kilograms</div>
-    //     </div>
-    //     <button type="submit" className="btn btn-success">Check BMI</button>
-    //   </form>
-    //   {
-    //     checked ?
-    //       <div className="row">
-    //         <div className="col-2 text-truncate my-3">
-    //           BMI is {BMI}
-    //         </div>
-    //       </div>
-    //       :
-    //       ""
-    //   }
-    // </div>
+</>
   )
 }
 

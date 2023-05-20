@@ -8,6 +8,7 @@ import Login from './Components/Login';
 import SignIn from './Components/SignIn'
 import LoginDoctor from './Components/LoginDoctor'
 import { dataref } from './Components/firebase';
+import DoctorNavbar from './Components/Doctor/DoctorNavBar'
 import {
   BrowserRouter as Router,
   Routes,
@@ -17,6 +18,7 @@ import { useState } from 'react';
 import LandingPage from './Components/LandingPage';
 import Result from './Components/Result';
 import UserProfile from './Components/UserProfile';
+import PatientListScreen from './Components/Doctor/PatientListScreen';
 
 function App() {
   const [userName,setuserName] = useState('');
@@ -31,8 +33,9 @@ function App() {
     return (
     <div > 
       <Router>
-            <Navbar login={loggedIn} userName = {userName}></Navbar>
+            {/* //{sessionStorage.getItem('Doctor') ? <DoctorNavbar/> : null } */}
             <Routes>
+            <Route path='/patientlist' element={<PatientListScreen/>}></Route>
               <Route path='/' element={<LandingPage/>}></Route>
               <Route path='/About' element={<About/>}></Route>
               <Route path='/userProfile' element={<UserProfile/>}></Route>
@@ -41,7 +44,7 @@ function App() {
               <Route path='/signIn' element={<SignIn/>}></Route>
               <Route path='/history' element={<History prev={Prev}/>}></Route>
               <Route path='/showResult' element={<Result></Result>}></Route>
-              <Route path='/loginDoctor' element={<LoginDoctor/>}></Route>
+              <Route path='/loginDoctor' element={<LoginDoctor userName={userName} setuserName={setuserName} setLoggedIn={setLoggedIn} setPrev={setPrev}/>}></Route>
               <Route path='/login' element={<Login userName={userName} setuserName={setuserName} setLoggedIn={setLoggedIn} setPrev={setPrev}/>}></Route>
             </Routes>
           </Router>

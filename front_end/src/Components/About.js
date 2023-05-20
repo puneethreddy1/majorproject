@@ -44,6 +44,7 @@
 
 // export default About
 import { ArrowPathIcon, CloudArrowUpIcon, FingerPrintIcon, LockClosedIcon } from '@heroicons/react/24/outline'
+import NavBar from './Navbar'
 
 const features = [
   {
@@ -67,6 +68,8 @@ const features = [
 
 export default function About() {
   return (
+    <>
+    <NavBar />
     <div className="bg-white py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-2xl lg:text-center">
@@ -96,6 +99,7 @@ export default function About() {
         </div>
       </div>
     </div>
+    </>
   )
 }
 

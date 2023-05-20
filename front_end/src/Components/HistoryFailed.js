@@ -1,6 +1,9 @@
+import NavBar from "./Navbar";
+
 export default function HistoryFailer() {
     return (
       <>
+      
         {/*
           This example requires updating your template:
   

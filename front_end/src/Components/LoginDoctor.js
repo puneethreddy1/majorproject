@@ -5,14 +5,14 @@ const LoginDoctor = (props) => {
     const [Password, setPassword] = useState("")
     const check = (e) => {
         e.preventDefault();
-        console.log();
         dataref.ref(`Doctor`).child(Email).child(Password).get()
             .then((e) => {
                 if (e.exists()) {
                     props.setuserName(Email);
                     props.setLoggedIn(true);
                     sessionStorage.setItem('UserName', Email);
-                    window.location.href = '/Doctor'
+                    sessionStorage.setItem('Doctor',true);
+                    window.location.href = '/patientlist'
                 }
             })
     }

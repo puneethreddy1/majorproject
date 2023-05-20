@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { dataref } from './firebase'
+import NavBar from './Navbar'
 const Login = (props) => {
     const [Email, setEmail] = useState("")
     const [Password, setPassword] = useState("")
@@ -12,6 +13,12 @@ const Login = (props) => {
                     props.setuserName(Email);
                     props.setLoggedIn(true);
                     sessionStorage.setItem('UserName', Email);
+                    dataref.ref(`User`).child(Email).get().then((el)=>{
+                        if(el.exists()){
+                            console.log(el.val());
+                            sessionStorage.setItem("UserInfo",el.val().email)
+                        }
+                    })
                     window.location.href = '/About'
                 }
             })
@@ -21,6 +28,8 @@ const Login = (props) => {
         backgroundColor: '#f7f1f1'
     }
     return (
+        <>
+        <NavBar/>
         <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
             <div className="sm:mx-auto sm:w-full sm:max-w-sm">
                 <h1 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-1900">Diabates Prediction Application</h1>
@@ -94,7 +103,7 @@ const Login = (props) => {
             </div>
 
         </div>
-
+        </>
         // <div className='container my-3' style={style}>
         //     <form onSubmit={check}>
         //         <h1 className="text-center display-6">Login</h1>

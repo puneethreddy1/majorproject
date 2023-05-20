@@ -3,6 +3,9 @@ import { dataref } from './firebase'
 import Select from "react-select";
 import { Outlet, Link } from "react-router-dom";
 import axios from 'axios';
+import CheckFailed from './CheckFailed';
+import NavBar from './Navbar';
+import Result from './Result';
 const CheckDiabetes = () => {
   const [Gender, setGender] = useState("")
   const [highClr, sethighClr] = useState("")
@@ -17,21 +20,8 @@ const CheckDiabetes = () => {
   const [diffWalk, setdiffWalk] = useState("")
   const [Alcoholic, setAlcoholic] = useState("")
   const [outCome, setoutCome] = useState(false)
-  let dataForm={
-    Gender : Gender.value,
-    highClr : highClr.value,
-    Age : Age,
-    BloodPressure : BloodPressure.value,
-    PrevHeartD : PrevHeartD.value,
-    PhysicalHealth : PhysicalHealth,
-    BMI : BMI,
-    MentalHealth : MentalHealth.value,
-    Smoking : Smoking.value,
-    generalHealth : generalHealth.value,
-    diffWalk : diffWalk.value,
-    Alcoholic : Alcoholic.value,
-    outCome : outCome
-    }
+  const [loading,setloading]=useState(false);
+
 
     const options = [
       { value: "0", label: "No" },
@@ -47,18 +37,19 @@ const CheckDiabetes = () => {
     ];
   
     const sex = [
-      { value: 'male', label: 'male' },
-      { value: 'female', label: 'female' }
+      { value: '1', label: 'male' },
+      { value: '0', label: 'female' }
     ];
     
-  const postData = () => {
-    dataref.ref(`User/${sessionStorage.getItem('UserName')}/History`).push(dataForm).then(()=>{
-        console.log("Added")
-        window.location.href = '/showResult'
+  async function postData(dataForm){
+    await dataref.ref(`User/${sessionStorage.getItem('UserName')}/History`).push(dataForm).then(()=>{
+        console.log(dataForm);
+        //window.location.href = '/showResult'
       }).catch((e)=>{
         console.log(e);
       })
-      // window.location.href = '/showResult'
+      sessionStorage.setItem('Values',JSON.stringify(dataForm));
+      window.location.href = '/showResult'
   }
   function getAgeForML(a){
     if(a>=18 && a<=54){
@@ -100,38 +91,65 @@ const CheckDiabetes = () => {
 
     }
   }
-var age1=getAgeForML(Age);
+var age1=getAgeForML(parseInt(Age));
 
-var data={bp:BloodPressure.value,
-    chol:highClr.value,
-    bmi: BMI,
-    smoker:Smoking.value,
-    heart: PrevHeartD.value,
-    alcohol:Alcoholic.value,
-    genhlth:generalHealth.value,
-    menthlth:MentalHealth.value,
-    phyhlth:PhysicalHealth,
-    diffwalk:diffWalk.value,
-    sex:Gender.value,
+var data={
+    bp:parseInt(BloodPressure.value),
+    chol:parseInt(highClr.value),
+    bmi: parseInt(BMI),
+    smoker:parseInt(Smoking.value),
+    heart: parseInt(PrevHeartD.value),
+    alcohol:parseInt(Alcoholic.value),
+    genhlth:parseInt(generalHealth.value),
+    menthlth:parseInt(MentalHealth),
+    phyhlth:parseInt(PhysicalHealth),
+    diffwalk:parseInt(diffWalk.value),
+    sex:parseInt(Gender.value),
     age:age1
   }
-  async function predictValue() {
-    try {
-        const result = (await axios.post("/", data))
-        console.log(result.data.Prediction)
-        return result.data.Prediction;
-        
-
-    } catch (e) {
-        console.log(e);
+async function predictValue(){
+  let x;
+  try{
+    await fetch("/",{
+      method:"POST",
+      headers: { 'Content-Type': 'application/json' },
+      body:JSON.stringify(data)
+    })
+    .then(res=>res.json())
+    .then(data=>{
+      console.log(JSON.stringify(data.Prediction))
+       x=data.Prediction;
     }
+      )
+    return x;
+  }catch(e){
+    console.log(e)
+  }
 }
 
-  const check = (e) => {
+ async function check(e){
     e.preventDefault();
-    setoutCome(predictValue());
-    postData();
-    
+        let x=await predictValue();
+      let y=x==0?false:true;
+   console.log(y)
+   let dataForm={
+    Gender : Gender.value,
+    highClr : highClr.value,
+    Age : Age,
+    BloodPressure : BloodPressure.value,
+    PrevHeartD : PrevHeartD.value,
+    PhysicalHealth : PhysicalHealth,
+    BMI : BMI,
+    MentalHealth : MentalHealth,
+    Smoking : Smoking.value,
+    generalHealth : generalHealth.value,
+    diffWalk : diffWalk.value,
+    Alcoholic : Alcoholic.value,
+    outCome : y
+    }
+    sessionStorage.setItem('result', y);
+    postData(dataForm);
+
   }
 
   const style = {
@@ -143,6 +161,11 @@ var data={bp:BloodPressure.value,
   }
   return (
     <div>
+      <NavBar/>
+      {sessionStorage.getItem('UserName') == undefined ?
+        <CheckFailed />
+        :
+        <div>
       <form className="bg-white my-10" onSubmit={check}>
         <div className="mx-auto max-w-7xl px-6 ">
           <div className="mx-auto max-w-2xl lg:text-center">
@@ -153,7 +176,7 @@ var data={bp:BloodPressure.value,
           <div className="mb-3 my-10 row">
             <label htmlFor="staticEmail" className="col-sm-2 col-htmlForm-label">Gender</label>
             <div className="col-sm-10">
-              <Select options={sex} onChange={(selectedOption)=>{
+              <Select options={sex} onChange={(selectedOption) => {
                 setGender(selectedOption);
               }} id='highClr' />
             </div>
@@ -161,13 +184,13 @@ var data={bp:BloodPressure.value,
           <div className="mb-3 row">
             <label htmlFor="staticEmail" className="col-sm-2 col-htmlForm-label">Age</label>
             <div className="col-sm-10">
-              <input type="number" className="htmlForm-control" value={Age} onChange={(e) => { setAge(e.target.value) }} required="true"/>
+              <input type="number" className="htmlForm-control" value={Age} onChange={(e) => { setAge(e.target.value) }} />
             </div>
           </div>
           <div className="mb-3 row">
             <label htmlFor="staticEmail" className="col-sm-2 col-htmlForm-label">High Blood Pressure</label>
             <div className="col-sm-10">
-              <Select options={options} onChange={(selectedOption)=>{
+              <Select options={options} onChange={(selectedOption) => {
                 setBloodPressure(selectedOption);
               }} autoFocus={true} id='BloodPressure' />
             </div>
@@ -175,7 +198,7 @@ var data={bp:BloodPressure.value,
           <div className="mb-3 row">
             <label htmlFor="staticEmail" className="col-sm-2 col-htmlForm-label">High Cholesterol</label>
             <div className="col-sm-10">
-              <Select options={options} onChange={(selectedOption)=>{
+              <Select options={options} onChange={(selectedOption) => {
                 sethighClr(selectedOption);
               }} id='highClr' />
             </div>
@@ -183,37 +206,42 @@ var data={bp:BloodPressure.value,
           <div className="mb-3 row">
             <label htmlFor="staticEmail" className="col-sm-2 col-htmlForm-label">BMI</label>
             <div className="col-sm-10">
-              <input type="number" className="htmlForm-control" value={BMI} onChange={(e) => { setBMI(e.target.value) }} required="true"/>
+              <input type="number" className="htmlForm-control" value={BMI} onChange={(e) => { setBMI(e.target.value) }} />
             </div>
           </div>
           <div className="mb-3 row">
             <label htmlFor="staticEmail" className="col-sm-2 col-htmlForm-label">Previous Heart Disease</label>
             <div className="col-sm-10">
-              <Select options={options} onChange={(selectedOption)=>{
+              <Select options={options} onChange={(selectedOption) => {
                 setPrevHeartD(selectedOption);
-              }}  />
+              }} />
             </div>
           </div>
           <div className="mb-3 row">
             <label htmlFor="staticEmail" className="col-sm-2 col-htmlForm-label">Physical Health</label>
             <div className="col-sm-10">
-              <input type="number" className="htmlForm-control" value={PhysicalHealth} onChange={(e) => { setPhysicalHealth(e.target.value) }} required="true"/>
-              <div id="emailHelp" className="htmlForm-text">How many days were you not physically active</div>
+              <input type="number" min="1" max="30" className="htmlForm-control" value={PhysicalHealth} onChange={(e) => { setPhysicalHealth(e.target.value) }} />
+              <div id="emailHelp" className="htmlForm-text">How many days does it normally take to heal your injuries.</div>
             </div>
           </div>
           <div className="mb-3 row">
-            <label htmlFor="staticEmail" className="col-sm-2 col-htmlForm-label">Mental Health</label>
+          <label htmlFor="staticEmail" className="col-sm-2 col-htmlForm-label">Mental Health</label>
             <div className="col-sm-10">
-              <Select options={rating} onChange={(selectedOption)=>{
+              <input type="number" min="1" max="30" className="htmlForm-control" value={MentalHealth} onChange={(e) => { setMentalHealth(e.target.value) }} />
+              <div id="emailHelp" className="htmlForm-text">How many days does it normally take to heal your injuries.</div>
+            </div>
+            {/* <label htmlFor="staticEmail" className="col-sm-2 col-htmlForm-label">Mental Health</label>
+            <div className="col-sm-10">
+              <Select options={rating} onChange={(selectedOption) => {
                 setMentalHealth(selectedOption);
               }} id='highClr' />
               <div id="emailHelp" className="htmlForm-text">How much do you rate your mental health</div>
-            </div>
+            </div> */}
           </div>
           <div className="mb-3 row">
             <label htmlFor="staticEmail" className="col-sm-2 col-htmlForm-label">General Health</label>
             <div className="col-sm-10">
-              <Select options={rating} onChange={(selectedOption)=>{
+              <Select options={rating} onChange={(selectedOption) => {
                 setgeneralHealth(selectedOption);
               }} id='highClr' />
               <div id="emailHelp" className="htmlForm-text">How much do you rate your General health</div>
@@ -222,7 +250,7 @@ var data={bp:BloodPressure.value,
           <div className="mb-3 row">
             <label htmlFor="staticEmail" className="col-sm-2 col-htmlForm-label">Difficulty In Walk</label>
             <div className="col-sm-10">
-              <Select options={options} onChange={(selectedOption)=>{
+              <Select options={options} onChange={(selectedOption) => {
                 setdiffWalk(selectedOption);
               }} id='highClr' />
             </div>
@@ -230,7 +258,7 @@ var data={bp:BloodPressure.value,
           <div className="mb-3 row">
             <label htmlFor="staticEmail" className="col-sm-2 col-htmlForm-label">Smoking</label>
             <div className="col-sm-10">
-              <Select options={options} onChange={(selectedOption)=>{
+              <Select options={options} onChange={(selectedOption) => {
                 setSmoking(selectedOption);
               }} id='highClr' />
             </div>
@@ -238,7 +266,7 @@ var data={bp:BloodPressure.value,
           <div className="mb-3 row">
             <label htmlFor="staticEmail" className="col-sm-2 col-htmlForm-label">Alcoholic</label>
             <div className="col-sm-10">
-              <Select options={options} onChange={(selectedOption)=>{
+              <Select options={options} onChange={(selectedOption) => {
                 setAlcoholic(selectedOption);
               }} id='highClr' />
             </div>
@@ -249,7 +277,8 @@ var data={bp:BloodPressure.value,
         </div>
       </form>
     </div>
-
+}
+</div>
   )
 }
 

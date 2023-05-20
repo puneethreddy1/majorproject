@@ -1,18 +1,18 @@
 import React from 'react'
 
-export default function Records(props){
-console.log(props)
+const Records = (props) => {
+
   return (
     <tr className="table-row">
       <td className="table-col" data-title="Name"><span className="text">
         {
         !props.val.outCome ? 
-        <div className="status is-failed">
+        <div className="status is-complete">
           <span className="status-icon"></span>
           <span className="text">Negative</span>
         </div>
         :
-        <div className="status is-complete">
+        <div className="status is-failed">
           <span className="status-icon"></span>
           <span className="text">Positive</span>
         </div>
@@ -39,3 +39,4 @@ console.log(props)
   )
 }
 
+export default Records
